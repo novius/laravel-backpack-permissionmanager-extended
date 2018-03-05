@@ -25,12 +25,12 @@
     ],
     "require": {
         "php": ">=7.1",
-        "laravel/framework": "~5.4.0|~5.5.0"
+        "backpack/permissionmanager": "^2.1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "~2.5.0",
-        "phpunit/phpunit": "~5.7",
-        "orchestra/testbench": "~3.0"
+        "friendsofphp/php-cs-fixer": "~2.8.0",
+        "phpunit/phpunit": "~6",
+        "orchestra/testbench": "~3.5"
     },
     "autoload": {
         "psr-4": {
