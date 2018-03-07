@@ -26,15 +26,24 @@ Novius\Backpack\PermissionManager\PermissionManagerServiceProvider::class,
 
 ## Configuration
 
-@todo
+This package provides a configuration file whose values overwrite the configuration of `Backpack\PermissionManager`.
 
-## Usage & Features
+You can publish the configuration file if you want to change these values :
+```
+php artisan vendor:publish --provider="Novius\Backpack\PermissionManager\PermissionManagerServiceProvider" --tag=config
+```
 
-@todo
+You can also publish the views, lang and routes :
+```
+php artisan vendor:publish --provider="Novius\Backpack\PermissionManager\PermissionManagerServiceProvider" --tag=views
+php artisan vendor:publish --provider="Novius\Backpack\PermissionManager\PermissionManagerServiceProvider" --tag=lang
+php artisan vendor:publish --provider="Novius\Backpack\PermissionManager\PermissionManagerServiceProvider" --tag=routes
+```
 
-## Testing
+## Features
 
-@todo
+* Improved interface to manage the roles and permissions on the user CRUD
+* Improved interface to manage the permissions on the role CRUD
 
 ## Lint
 
