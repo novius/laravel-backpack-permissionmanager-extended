@@ -12,8 +12,6 @@ class Role extends OriginalRole
             'entry' => $this,
             'column' => [
                 'label'         => ucfirst(trans('backpack::permissionmanager.permission_plural')),
-                'type'          => 'model_function',
-                'function_name' => 'getCrudColumnPermissions',
                 'name'          => 'permissions',
                 'entity'        => 'permissions',
                 'attribute'     => 'name',
