@@ -1,4 +1,62 @@
-<!-- permissions and roles -->
+@php
+// Sanitizes the field value
+$field['value'] = isset($field['value']) && is_array($field['value']) ? $field['value'] : null;
+
+$fieldRole = $field['subfields']['primary'];
+$fieldPermission = $field['subfields']['secondary'];
+
+// Gets the roles with their permissions
+$roles = $fieldRole['model']::with($fieldRole['entity_secondary'])->get();
+
+// Builds a simple matrix of roles and permissions (role id as key and array of permission ids as value)
+$rolesPermissions = $roles->pluck($fieldRole['entity_secondary'], 'id')->map(function($permissions) {
+    return $permissions->pluck('id');
+});
+
+// Gets the entity roles and permissions
+$entityRoles = collect(is_array($field['value']) && isset($field['value'][0]) ? $field['value'][0] : []);
+$entityPermissions = collect(is_array($field['value']) && isset($field['value'][1]) ? $field['value'][0] : []);
+
+// Gets the permissions granted by the entity roles (update form only)
+$entityRolesPermissions = collect();
+
+// Gets the entity with roles and permissions
+$entity = ($crud->getModel())->with($fieldRole['entity'])
+    ->with($fieldRole['entity'].'.'.$fieldRole['entity_secondary'])
+    ->find($id);
+
+// Gets the permissions of each role related to the entity
+$oldRoles = old($fieldRole['name']);
+if ($oldRoles) {
+    // ...from previous input (validation error)
+    $selectedRoles = $roles->filter(function($role) use ($oldRoles) {
+        return in_array($role->id, $oldRoles);
+    });
+} else {
+    // ...from current item
+    $selectedRoles = $entity->{$fieldRole['entity']};
+}
+
+// Converts to a flat list
+$entityRolesPermissions = $selectedRoles->map(function($role) use ($fieldPermission) {
+    return $role->{$fieldPermission['entity']}->pluck('id');
+})->flatten(1);
+
+// Groups permissions by prefix
+$permissionsByPrefix = $fieldPermission['model']::all()
+    ->sortBy(function($permission) {
+        return $permission->prefix() ?: PHP_INT_MAX; // Use PHP_INT_MAX as a little trick for sorting permissions without prefix at the end
+    })
+    ->groupBy(function($permission) {
+        return $permission->prefix();
+    });
+
+// Checks if there is at least one permission with a prefix
+$permissionWithPrefixExists = $permissionsByPrefix->keys()->filter()->isNotEmpty();
+
+$roleColumns = array_get($fieldRole, 'columns')
+@endphp
+
 <div class="col-md-12 checklist_dependency"  data-entity ="{{ $field['field_unique_name'] }}" @include('crud::inc.field_wrapper_attributes')>
 
     @if (!empty($field['label']))
@@ -7,65 +65,8 @@
 
     @include('crud::inc.field_translatable_icon')
 
-    <?php
-    // Sanitizes the field value
-    $field['value'] = isset($field['value']) && is_array($field['value']) ? $field['value'] : null;
-
-    $fieldRole = $field['subfields']['primary'];
-    $fieldPermission = $field['subfields']['secondary'];
-
-    // Gets the roles with their permissions
-    $roles = $fieldRole['model']::with($fieldRole['entity_secondary'])->get();
-
-    // Builds a simple matrix of roles and permissions (role id as key and array of permission ids as value)
-    $rolesPermissions = $roles->pluck($fieldRole['entity_secondary'], 'id')->map(function($permissions) {
-        return $permissions->pluck('id');
-    });
-
-    // Gets the entity roles and permissions
-    $entityRoles = collect(is_array($field['value']) && isset($field['value'][0]) ? $field['value'][0] : []);
-    $entityPermissions = collect(is_array($field['value']) && isset($field['value'][1]) ? $field['value'][0] : []);
-
-    // Gets the permissions granted by the entity roles (update form only)
-    $entityRolesPermissions = collect();
-
-    // Gets the entity with roles and permissions
-    $entity = ($crud->getModel())->with($fieldRole['entity'])
-        ->with($fieldRole['entity'].'.'.$fieldRole['entity_secondary'])
-        ->find($id);
-
-    // Gets the permissions of each role related to the entity
-    $oldRoles = old($fieldRole['name']);
-    if ($oldRoles) {
-        // ...from previous input (validation error)
-        $selectedRoles = $roles->filter(function($role) use ($oldRoles) {
-            return in_array($role->id, $oldRoles);
-        });
-    } else {
-        // ...from current item
-        $selectedRoles = $entity->{$fieldRole['entity']};
-    }
-
-    // Converts to a flat list
-    $entityRolesPermissions = $selectedRoles->map(function($role) use ($fieldPermission) {
-        return $role->{$fieldPermission['entity']}->pluck('id');
-    })->flatten(1);
-
-    // Groups permissions by prefix
-    $permissionsByPrefix = $fieldPermission['model']::all()
-        ->sortBy(function($permission) {
-            return $permission->prefix() ?: PHP_INT_MAX; // Use PHP_INT_MAX as a little trick for sorting permissions without prefix at the end
-        })
-        ->groupBy(function($permission) {
-            return $permission->prefix();
-        });
-
-    // Checks if there is at least one permission with a prefix
-    $permissionWithPrefixExists = $permissionsByPrefix->keys()->filter()->isNotEmpty();
-
-    ?>
     <script>
-        var  {{ $field['field_unique_name'] }} = {!! $rolesPermissions->toJson() !!};
+        var {{ $field['field_unique_name'] }} = {!! $rolesPermissions->toJson() !!};
     </script>
 
     <div class="row form-group">
@@ -87,8 +88,6 @@
                 @endif
             @endif
         </div>
-
-        <?php $roleColumns = array_get($fieldRole, 'columns') ?>
 
         @if (is_bool($roleColumns))
             <div class="col-sm-12">
@@ -144,12 +143,12 @@
         </div>
         <div class="col-sm-2">
             <div class="pull-right">
-                <button class="btn btn-default btn-xs uncheck-all" title="Uncheck all">
-                    <i class="fa fa-square-o"></i>&nbsp; None
+                <button class="btn btn-default btn-xs uncheck-all" title="{{ trans('backpack-permissionmanager-extended::crud.select_none_tip') }}">
+                    <i class="fa fa-square-o"></i>&nbsp;&nbsp;{{ trans('backpack-permissionmanager-extended::crud.select_none') }}
                 </button>
                 &nbsp;
-                <button href="" class="btn btn-default btn-xs check-all" title="Check all">
-                    <i class="fa fa-check-square-o"></i>&nbsp; All
+                <button href="" class="btn btn-default btn-xs check-all" title="{{ trans('backpack-permissionmanager-extended::crud.select_all_tip') }}">
+                    <i class="fa fa-check-square-o"></i>&nbsp;&nbsp;{{ trans('backpack-permissionmanager-extended::crud.select_all') }}
                 </button>
             </div>
         </div>
@@ -181,11 +180,11 @@
                     @endif
                     <div class="col-sm-{{ $permissionWithPrefixExists ? 7 : 12 }}">
                         @foreach ($permissions as $permission)
-                            <?php
+                            @php
                             $value = array_get($field, 'value');
                             $hasPermissionViaUser = ($value[1]->pluck('id')->contains($permission->id)) || (old($fieldPermission['name']) && in_array($permission->id, old($fieldPermission['name'])));
                             $hasPermissionViaRole = $entityRolesPermissions->contains($permission->id);
-                            ?>
+                            @endphp
                             <div class="checkbox inline no-margin">
                                 <label>
                                     <input
@@ -223,12 +222,12 @@
                     @if ($permissionWithPrefixExists)
                         <div class="col-sm-2">
                             <div class="pull-right">
-                                <button href="" class="btn btn-default btn-xs uncheck-row" title="Uncheck all" class="">
-                                    <i class="fa fa-square-o"></i>&nbsp; None
+                                <button href="" class="btn btn-default btn-xs uncheck-row" title="{{ trans('backpack-permissionmanager-extended::crud.select_row_none_tip') }}">
+                                    <i class="fa fa-square-o"></i>&nbsp;&nbsp;{{ trans('backpack-permissionmanager-extended::crud.select_row_none') }}
                                 </button>
                                 &nbsp;
-                                <button href="" class="btn btn-default btn-xs check-row" title="Check all">
-                                    <i class="fa fa-check-square-o"></i>&nbsp; All
+                                <button href="" class="btn btn-default btn-xs check-row" title="{{ trans('backpack-permissionmanager-extended::crud.select_row_all_tip') }}">
+                                    <i class="fa fa-check-square-o"></i>&nbsp;&nbsp;{{ trans('backpack-permissionmanager-extended::crud.select_row_all') }}
                                 </button>
                             </div>
                         </div>

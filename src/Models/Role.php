@@ -8,7 +8,7 @@ class Role extends OriginalRole
 {
     public function getCrudColumnPermissions()
     {
-        return view('backpack-permission-extended::columns.permissions', [
+        return view('backpack-permissionmanager-extended::columns.permissions', [
             'entry' => $this,
             'column' => [
                 'label'         => ucfirst(trans('backpack::permissionmanager.permission_plural')),

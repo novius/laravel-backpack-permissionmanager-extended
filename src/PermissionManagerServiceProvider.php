@@ -16,16 +16,23 @@ class PermissionManagerServiceProvider extends ServiceProvider
     {
         $appRootDir = dirname(__DIR__, 1);
 
-        // Setups the routes for the application
+        // Setups the routes
         $this->setupRoutes($this->app->router);
 
-        // Publishes the extended config
-        $this->publishes([$appRootDir.'/config/permission-extended.php' => base_path().'/config/backpack-permission-extended.php'], 'config');
+        // Publishes the config, routes and lang files
+        $this->publishes([$appRootDir.'/config' => config_path('backpackextended')], 'config');
+        $this->publishes([$appRootDir.'/routes' => base_path().'/routes/backpackextended'], 'routes');
+        $this->publishes([$appRootDir.'/resources/lang' => resource_path('lang/vendor/backpack-permissionmanager-extended')], 'lang');
+        $this->publishes([$appRootDir.'/resources/views' => resource_path('views/vendor/backpack-permissionmanager-extended')], 'views');
 
-        $this->loadViewsFrom($appRootDir.'/resources/views', 'backpack-permission-extended');
+        // Loads the views
+        $this->loadViewsFrom($appRootDir.'/resources/views', 'backpack-permissionmanager-extended');
+
+        // Loads the translations
+        $this->loadTranslationsFrom($appRootDir.'/resources/lang', 'backpack-permissionmanager-extended');
 
         // Merges the current package config into the Backpack\PermissionManager config
-        $this->mergeConfigTo($appRootDir.'/config/permission-extended.php', 'laravel-permission');
+        $this->mergeConfigTo($appRootDir.'/config/permissionmanager.php', 'laravel-permission');
 
         // Merges the Backpack\PermissionManager local config into the Backpack\PermissionManager config
         if (file_exists(config_path('laravel-permission.php'))) {
@@ -33,8 +40,8 @@ class PermissionManagerServiceProvider extends ServiceProvider
         }
 
         // Merges the current local package config into the Backpack\PermissionManager config
-        if (file_exists(config_path('backpack-permission-extended.php'))) {
-            $this->mergeConfigTo(config_path('backpack-permission-extended.php'), 'laravel-permission');
+        if (file_exists(config_path('backpackextended/permissionmanager.php'))) {
+            $this->mergeConfigTo(config_path('backpackextended/permissionmanager.php'), 'laravel-permission');
         }
     }
 
@@ -69,15 +76,13 @@ class PermissionManagerServiceProvider extends ServiceProvider
      */
     public function setupRoutes()
     {
-        $routeFilePath = '/routes/backpack/permissionmanager-extended.php';
-
         // Loads the route file from the local app if exists
-        if (file_exists(base_path().$routeFilePath)) {
-            $this->loadRoutesFrom(base_path().$routeFilePath);
+        if (file_exists(base_path('routes/backpackextended/permissionmanager.php'))) {
+            $this->loadRoutesFrom(base_path('routes/backpackextended/permissionmanager.php'));
         }
         // Otherwise loads the route file from the current package
         else {
-            $this->loadRoutesFrom(dirname(__DIR__, 1).$routeFilePath);
+            $this->loadRoutesFrom(dirname(__DIR__, 1).'/routes/permissionmanager.php');
         }
     }
 }

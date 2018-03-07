@@ -10,11 +10,14 @@
 |
 */
 
-Route::group([
-            'namespace'  => 'Novius\Backpack\PermissionManager\Http\Controllers',
-            'prefix'     => config('backpack.base.route_prefix', 'admin'),
-            'middleware' => ['web', 'admin'],
-    ], function () {
+Route::group(
+    [
+        'namespace'  => 'Novius\Backpack\PermissionManager\Http\Controllers',
+        'prefix'     => config('backpack.base.route_prefix', 'admin'),
+        'middleware' => ['web', 'admin'],
+    ],
+    function () {
         CRUD::resource('role', 'RoleCrudController');
         CRUD::resource('user', 'UserCrudController');
-    });
+    }
+);

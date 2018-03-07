@@ -1,4 +1,3 @@
-<!-- permissions -->
 <div class="form-group col-md-12 checklist" @include('crud::inc.field_wrapper_attributes') >
 
     @if (!empty($field['label']))
@@ -11,11 +10,11 @@
         <div class="col-sm-12">
             <div class="pull-right">
                 <button class="btn btn-default btn-xs uncheck-all" title="Uncheck all">
-                    <i class="fa fa-square-o"></i>&nbsp; None
+                    <i class="fa fa-square-o"></i>&nbsp;&nbsp;{{ trans('backpack-permissionmanager-extended::crud.select_none') }}
                 </button>
                 &nbsp;
                 <button href="" class="btn btn-default btn-xs check-all" title="Check all">
-                    <i class="fa fa-check-square-o"></i>&nbsp; All
+                    <i class="fa fa-check-square-o"></i>&nbsp;&nbsp;{{ trans('backpack-permissionmanager-extended::crud.select_all') }}
                 </button>
             </div>
         </div>
@@ -47,23 +46,21 @@
                 <div class="col-sm-2">
                     <div class="pull-right">
                         <button href="" class="btn btn-default btn-xs uncheck-row" title="Uncheck all" class="">
-                            <i class="fa fa-square-o"></i>&nbsp; None
+                            <i class="fa fa-square-o"></i>&nbsp;&nbsp;{{ trans('backpack-permissionmanager-extended::crud.select_row_none') }}
                         </button>
                         &nbsp;
                         <button href="" class="btn btn-default btn-xs check-row" title="Check all">
-                            <i class="fa fa-check-square-o"></i>&nbsp; All
+                            <i class="fa fa-check-square-o"></i>&nbsp;&nbsp;{{ trans('backpack-permissionmanager-extended::crud.select_row_all') }}
                         </button>
                     </div>
                 </div>
         </div>
     @endforeach
 
-    {{-- HINT --}}
     @if (isset($field['hint']))
         <p class="help-block">{!! $field['hint'] !!}</p>
     @endif
 </div>
-
 
 {{-- ########################################## --}}
 {{-- Extra CSS and JS for this particular field --}}
