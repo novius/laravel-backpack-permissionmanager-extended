@@ -12,8 +12,8 @@
 
 Route::group(
     [
-        'namespace'  => 'Novius\Backpack\PermissionManager\Http\Controllers',
-        'prefix'     => config('backpack.base.route_prefix', 'admin'),
+        'namespace' => 'Novius\Backpack\PermissionManager\Http\Controllers',
+        'prefix' => config('backpack.base.route_prefix', 'admin'),
         'middleware' => ['web', 'admin'],
     ],
     function () {

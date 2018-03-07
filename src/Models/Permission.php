@@ -13,8 +13,8 @@ class Permission extends OriginalPermission
      */
     public function prefix()
     {
-        if (!str_contains($this->name, '::')) {
-            return null;
+        if (! str_contains($this->name, '::')) {
+            return;
         }
 
         list($prefix) = explode('::', $this->name);

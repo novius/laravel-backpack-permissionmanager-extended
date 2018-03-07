@@ -11,12 +11,12 @@ class Role extends OriginalRole
         return view('backpack-permissionmanager-extended::columns.permissions', [
             'entry' => $this,
             'column' => [
-                'label'         => ucfirst(trans('backpack::permissionmanager.permission_plural')),
-                'name'          => 'permissions',
-                'entity'        => 'permissions',
-                'attribute'     => 'name',
-                'model'         => config('laravel-permission.models.permission'),
-                'pivot'         => true,
+                'label' => ucfirst(trans('backpack::permissionmanager.permission_plural')),
+                'name' => 'permissions',
+                'entity' => 'permissions',
+                'attribute' => 'name',
+                'model' => config('laravel-permission.models.permission'),
+                'pivot' => true,
             ],
         ]);
     }
