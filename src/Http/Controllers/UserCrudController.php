@@ -32,13 +32,11 @@ class UserCrudController extends OriginalUserCrudController
             ],
             [ // n-n relationship (with pivot table)
                 'label'     => trans('backpack::permissionmanager.extra_permissions'), // Table column heading
-                'type'      => 'view',
-                'view'      => 'backpack-permission-extended::columns.permissions',
+                'type'      => 'select_multiple',
                 'name'      => 'permissions', // the method that defines the relationship in your Model
                 'entity'    => 'permissions', // the method that defines the relationship in your Model
-                'attribute' => null, // foreign key attribute that is shown as the permission name (string, callback or null for default value)
+                'attribute' => 'name', // foreign key attribute that is shown to user
                 'model'     => config('laravel-permission.models.permission'), // foreign key model
-                'inline'    => false, // true for all groups of permission on the same row or false for each on a row
             ],
         ]);
 
