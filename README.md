@@ -1,4 +1,7 @@
 # Backpack Permission Manager Extended
+[![Travis](https://img.shields.io/travis/novius/laravel-backpack-permissionmanager-extended.svg?maxAge=1800&style=flat-square)](https://travis-ci.org/novius/laravel-backpack-permissionmanager-extended)
+[![Packagist Release](https://img.shields.io/packagist/v/novius/laravel-backpack-permissionmanager-extended.svg?maxAge=1800&style=flat-square)](https://packagist.org/packages/novius/laravel-backpack-permissionmanager-extended)
+[![Licence](https://img.shields.io/packagist/l/novius/laravel-backpack-permissionmanager-extended.svg?maxAge=1800&style=flat-square)](https://github.com/novius/laravel-backpack-permissionmanager-extended#licence)
 
 This package extends [Backpack/PermissionManager](https://github.com/Laravel-Backpack/PermissionManager). See all features added bellow.
 
