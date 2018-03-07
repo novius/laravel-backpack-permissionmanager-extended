@@ -22,9 +22,6 @@ class RoleCrudController extends OriginalRoleCrudController
             'pivot'     => true, // on create&update, do you need to add/delete pivot table entries?
         ]);
 
-
-//        'view'      => 'backpack-permission-extended::columns.permissions',
-
         $this->crud->addField([
             'label'     => '',
             'type'      => 'view',
