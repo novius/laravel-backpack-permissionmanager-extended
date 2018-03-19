@@ -21,9 +21,13 @@ $entityPermissions = collect(is_array($field['value']) && isset($field['value'][
 $entityRolesPermissions = collect();
 
 // Gets the entity with roles and permissions
-$entity = ($crud->getModel())->with($fieldRole['entity'])
-    ->with($fieldRole['entity'].'.'.$fieldRole['entity_secondary'])
-    ->find($id);
+if (!empty($id)) {
+    $entity = ($crud->getModel())->with($fieldRole['entity'])
+        ->with($fieldRole['entity'].'.'.$fieldRole['entity_secondary'])
+        ->find($id);
+} else {
+    $entity = null;
+}
 
 // Gets the permissions of each role related to the entity
 $oldRoles = old($fieldRole['name']);
@@ -32,9 +36,11 @@ if ($oldRoles) {
     $selectedRoles = $roles->filter(function($role) use ($oldRoles) {
         return in_array($role->id, $oldRoles);
     });
-} else {
+} elseif (!empty($entity)) {
     // ...from current item
     $selectedRoles = $entity->{$fieldRole['entity']};
+} else {
+    $selectedRoles = collect();
 }
 
 // Converts to a flat list
@@ -81,7 +87,7 @@ $roleColumns = array_get($fieldRole, 'columns')
                     @foreach(old($fieldRole['name']) as $item)
                         <input type="hidden" class="primary_hidden" name="{{ $fieldRole['name'] }}[]" value="{{ $item }}">
                     @endforeach
-                @else
+                @elseif (!empty($field['value'][0]))
                     @foreach($field['value'][0]->pluck('id', 'id')->toArray() as $item)
                         <input type="hidden" class="primary_hidden" name="{{ $fieldRole['name'] }}[]" value="{{ $item }}">
                     @endforeach
@@ -159,7 +165,7 @@ $roleColumns = array_get($fieldRole, 'columns')
                     @foreach(old($fieldPermission['name']) as $item)
                         <input type="hidden" class="secondary_hidden" name="{{ $fieldPermission['name'] }}[]" value="{{ $item }}">
                     @endforeach
-                @else
+                @elseif (!empty($field['value'][1]))
                     @foreach($field['value'][1]->pluck('id')->toArray() as $item)
                         <input type="hidden" class="secondary_hidden" name="{{ $fieldPermission['name'] }}[]" value="{{ $item }}">
                     @endforeach
@@ -182,7 +188,7 @@ $roleColumns = array_get($fieldRole, 'columns')
                         @foreach ($permissions as $permission)
                             @php
                             $value = array_get($field, 'value');
-                            $hasPermissionViaUser = ($value[1]->pluck('id')->contains($permission->id)) || (old($fieldPermission['name']) && in_array($permission->id, old($fieldPermission['name'])));
+                            $hasPermissionViaUser = (!empty($value[1]) && $value[1]->pluck('id')->contains($permission->id)) || (old($fieldPermission['name']) && in_array($permission->id, old($fieldPermission['name'])));
                             $hasPermissionViaRole = $entityRolesPermissions->contains($permission->id);
                             @endphp
                             <div class="checkbox inline no-margin">
